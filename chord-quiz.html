@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="和弦練習">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffffff">
+<title>和弦辨識練習</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;}
+#app{max-width:440px;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:100vh;}
+
+/* Header */
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:1px solid #e8e6de;border-radius:14px;}
+.lv-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#E1F5EE;color:#085041;}
+.hdr-mid{font-size:13px;color:#888;}
+.hdr-score{font-size:13px;font-weight:600;color:#1a1a1a;}
+
+/* Staff card */
+.staff-card{background:#fff;border:1px solid #e8e6de;border-radius:14px;padding:14px 12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.q-label{font-size:11px;color:#999;}
+
+/* Answer box */
+.answer-box{background:#f5f5f0;border:1px solid #e8e6de;border-radius:10px;padding:10px 14px;min-height:56px;display:flex;align-items:center;justify-content:space-between;transition:background 0.25s,border-color 0.25s;}
+.answer-box.correct{background:#EAF3DE;border-color:#97C459;}
+.answer-box.wrong{background:#FCEBEB;border-color:#F09595;}
+.answer-text{font-size:24px;font-weight:600;letter-spacing:1px;min-height:30px;color:#1a1a1a;}
+.correct-ans{font-size:11px;color:#A32D2D;margin-top:3px;}
+.feedback-icon{font-size:22px;}
+
+/* Keyboard */
+.kbd{background:#fff;border:1px solid #e8e6de;border-radius:14px;padding:10px;}
+.kbd-section{margin-bottom:8px;}
+.kbd-label{font-size:10px;color:#bbb;margin-bottom:5px;letter-spacing:0.8px;text-transform:uppercase;}
+.kbd-row{display:flex;flex-wrap:wrap;gap:5px;}
+.key{font-size:13px;font-weight:500;padding:8px 2px;border:1px solid #ddd;border-radius:8px;cursor:pointer;background:#f5f5f0;color:#1a1a1a;text-align:center;user-select:none;flex:1;transition:all 0.1s;-webkit-user-select:none;}
+.key:active{transform:scale(0.94);background:#e8e8e4;}
+.key.active{background:#1D9E75;color:#fff;border-color:#0F6E56;}
+.key.dim{opacity:0.28;cursor:default;}
+
+/* Actions */
+.actions{display:flex;gap:8px;}
+.btn{flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.15s;background:#f5f5f0;color:#1a1a1a;}
+.btn:active{transform:scale(0.97);}
+.btn.primary{background:#1D9E75;color:#fff;border-color:#0F6E56;}
+.btn.primary:disabled{background:#f0f0ec;color:#bbb;border-color:#e0e0da;cursor:default;}
+.btn.next-btn:disabled{opacity:0.38;cursor:default;}
+
+/* Summary */
+.summary{background:#fff;border:1px solid #e8e6de;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.sum-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.stat-box{background:#f5f5f0;border-radius:10px;padding:10px;text-align:center;}
+.stat-num{font-size:24px;font-weight:600;color:#1a1a1a;}
+.stat-lbl{font-size:10px;color:#999;margin-top:2px;}
+.sum-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;}
+.sum-item{padding:8px 10px;border-radius:10px;font-size:12px;display:flex;gap:8px;align-items:flex-start;}
+.sum-item.ok{background:#EAF3DE;border:1px solid #C0DD97;}
+.sum-item.bad{background:#FCEBEB;border:1px solid #F7C1C1;}
+.pass-msg{padding:11px;border-radius:10px;text-align:center;font-size:13px;font-weight:600;}
+.pass-msg.pass{background:#EAF3DE;color:#085041;}
+.pass-msg.fail{background:#FCEBEB;color:#791F1F;}
+.btn-full{width:100%;padding:13px;border-radius:10px;border:1px solid #0F6E56;background:#1D9E75;color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+.btn-sec{width:100%;padding:13px;border-radius:10px;border:1px solid #ddd;background:#f5f5f0;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;}
+
+/* Start screen */
+.start-screen{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 8px;}
+.start-title{font-size:24px;font-weight:700;text-align:center;color:#1a1a1a;}
+.start-desc{font-size:13px;color:#888;text-align:center;line-height:1.7;}
+.lv-cards{width:100%;display:flex;flex-direction:column;gap:8px;}
+.lv-card{padding:13px 16px;border:1px solid #e8e6de;border-radius:14px;background:#f5f5f0;cursor:pointer;transition:all 0.15s;}
+.lv-card:active{transform:scale(0.98);}
+.lv-card.locked{opacity:0.38;cursor:default;}
+.lv-card.current{border-color:#1D9E75;background:#E1F5EE;}
+.lv-card.mix{border-color:#7F77DD;background:#EEEDFE;}
+.lv-card-title{font-size:14px;font-weight:600;color:#1a1a1a;}
+.lv-card-desc{font-size:12px;color:#888;margin-top:3px;}
+.reset-note{font-size:11px;color:#bbb;text-align:center;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ── Music theory ──────────────────────────────────────────────────────
+const CHORD_DEFS={
+  'M':{intervals:[0,4,7]},'m':{intervals:[0,3,7]},
+  '7':{intervals:[0,4,7,10]},'M7':{intervals:[0,4,7,11]},'m7':{intervals:[0,3,7,10]},
+  '6':{intervals:[0,4,7,9]},'m6':{intervals:[0,3,7,9]},
+  'ø7':{intervals:[0,3,6,10]},'o7':{intervals:[0,3,6,9]},
+  '+':{intervals:[0,4,8]},'sus4':{intervals:[0,5,7]},
+};
+const LV_CHORDS={
+  1:['M','m'],
+  2:['7','M7','m7'],
+  3:['6','m6','ø7','o7','+'],
+  4:['M','m','7','M7','m7','6','m6','ø7','o7','+'],
+};
+const Q_SYMBOL={'M':'maj','m':'min','7':'dom7','M7':'△7','m7':'m7','6':'6','m6':'m6','ø7':'ø7','o7':'°7','+':'aug','sus4':'sus4'};
+const Q_DISPLAY={'M':'','m':'m','7':'7','M7':'△7','m7':'m7','6':'6','m6':'m6','ø7':'ø7','o7':'°7','+':'+','sus4':'sus4'};
+const qualityGroups=[
+  {label:'基礎',keys:['M','m']},
+  {label:'七和弦',keys:['7','M7','m7']},
+  {label:'進階',keys:['6','m6','ø7','o7','+','sus4']},
+];
+const ROOT_MIDI={'C':60,'C#':61,'D':62,'D#':63,'E':64,'F':65,'F#':66,'G':67,'G#':68,'A':69,'A#':70,'B':71};
+const ROOT_NAMES=Object.keys(ROOT_MIDI);
+const NOTES=['C','D','E','F','G','A','B'];
+const DIA_SEMI=[0,2,4,5,7,9,11];
+const NAME_TO_DIA={C:0,D:1,E:2,F:3,G:4,A:5,B:6};
+const QUALITY_DIA_STEPS={
+  'M':[0,2,4],'m':[0,2,4],
+  '7':[0,2,4,6],'M7':[0,2,4,6],'m7':[0,2,4,6],
+  '6':[0,2,4,5],'m6':[0,2,4,5],
+  'ø7':[0,2,4,6],'o7':[0,2,4,6],
+  '+':[0,2,4],'sus4':[0,3,4],
+};
+
+function generateChordNotes(rootKey,quality){
+  const rootMidi=ROOT_MIDI[rootKey];
+  const rootDia=NAME_TO_DIA[rootKey[0]];
+  const diaSteps=QUALITY_DIA_STEPS[quality];
+  const intervals=CHORD_DEFS[quality].intervals;
+  return diaSteps.map((dStep,i)=>{
+    const semi=intervals[i];
+    const midi=rootMidi+semi;
+    const targetDia=(rootDia+dStep)%7;
+    const diaOctaveCross=Math.floor((rootDia+dStep)/7);
+    const rootOctave=Math.floor(rootMidi/12)-1;
+    const targetOctave=rootOctave+diaOctaveCross;
+    const naturalMidi=(targetOctave+1)*12+DIA_SEMI[targetDia];
+    const accDiff=midi-naturalMidi;
+    let acc='';
+    if(accDiff===1)acc='#';
+    else if(accDiff===-1)acc='b';
+    else if(accDiff===2)acc='x';
+    else if(accDiff===-2)acc='bb';
+    const slot=(targetOctave-4)*7+(targetDia-2);
+    return {midi,slot,acc};
+  });
+}
+
+function doubleSharpSVG(cx,cy,ink){
+  const s=5;
+  return `<line x1="${cx-s}" y1="${cy-s}" x2="${cx+s}" y2="${cy+s}" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="${cx+s}" y1="${cy-s}" x2="${cx-s}" y2="${cy+s}" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>`;
+}
+
+function drawStaff(notes,container){
+  const W=300,HALF=10;
+  const BASE_Y=112;
+  const slotY=s=>BASE_Y-s*HALF;
+  const STAFF_SLOTS=[0,2,4,6,8];
+  const ink='#1a1a1a';
+  const bg='#ffffff';
+  const RX=10,RY=7.5;
+  const NX_BASE=195;
+  const ACC_X=NX_BASE-RX-14;
+  const sorted=[...notes].sort((a,b)=>a.slot-b.slot);
+  const positions=sorted.map((n,i)=>{
+    let nx=NX_BASE;
+    if(i>0&&Math.abs(n.slot-sorted[i-1].slot)===1)nx=NX_BASE+RX*2+2;
+    return {...n,nx};
+  });
+  const ledgerSet=new Set();
+  for(const n of sorted){
+    if(n.slot<=-2){for(let s=-2;s>=n.slot;s-=2)ledgerSet.add(s);}
+    if(n.slot>=10){for(let s=10;s<=n.slot;s+=2)ledgerSet.add(s);}
+  }
+  let svg=`<svg viewBox="0 0 ${W} 150" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block;">`;
+  svg+=`<rect width="${W}" height="150" fill="transparent"/>`;
+  for(const s of STAFF_SLOTS){
+    const y=slotY(s);
+    svg+=`<line x1="30" y1="${y}" x2="${W-8}" y2="${y}" stroke="${ink}" stroke-width="1" opacity="0.6"/>`;
+  }
+  svg+=`<text x="10" y="${slotY(0)+16}" font-size="100" fill="${ink}" font-family="serif" dominant-baseline="auto" opacity="0.8">𝄞</text>`;
+  for(const s of ledgerSet){
+    const y=slotY(s);
+    const maxNx=Math.max(NX_BASE,...positions.filter(n=>Math.abs(n.slot-s)<=1).map(n=>n.nx));
+    svg+=`<line x1="${NX_BASE-RX-5}" y1="${y}" x2="${maxNx+RX+5}" y2="${y}" stroke="${ink}" stroke-width="1"/>`;
+  }
+  for(const n of positions){
+    const y=slotY(n.slot);
+    const nx=n.nx;
+    if(n.acc==='#'){
+      svg+=`<text x="${ACC_X}" y="${y+5}" font-size="15" fill="${ink}" text-anchor="middle" font-family="serif">♯</text>`;
+    }else if(n.acc==='b'){
+      svg+=`<text x="${ACC_X}" y="${y+7}" font-size="17" fill="${ink}" text-anchor="middle" font-family="serif">♭</text>`;
+    }else if(n.acc==='x'){
+      svg+=doubleSharpSVG(ACC_X,y,ink);
+    }else if(n.acc==='bb'){
+      svg+=`<text x="${ACC_X-2}" y="${y+7}" font-size="13" fill="${ink}" text-anchor="middle" font-family="serif">♭♭</text>`;
+    }
+    svg+=`<ellipse cx="${nx}" cy="${y}" rx="${RX}" ry="${RY}" fill="${ink}" transform="rotate(-10,${nx},${y})"/>`;
+    svg+=`<ellipse cx="${nx}" cy="${y}" rx="${RX*0.42}" ry="${RY*0.55}" fill="${bg}" transform="rotate(-10,${nx},${y})"/>`;
+  }
+  svg+='</svg>';
+  container.innerHTML=svg;
+}
+
+// ── Daily reset ───────────────────────────────────────────────────────
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
+function loadProgress(){
+  try{
+    const raw=localStorage.getItem('chord_progress');
+    if(!raw)return null;
+    const data=JSON.parse(raw);
+    if(data.day!==todayKey())return null;
+    return data;
+  }catch(e){return null;}
+}
+function saveProgress(){
+  try{localStorage.setItem('chord_progress',JSON.stringify({day:todayKey(),unlockedLevel:S.unlockedLevel}));}catch(e){}
+}
+
+// ── State ─────────────────────────────────────────────────────────────
+const saved=loadProgress();
+let S={
+  screen:'start',level:1,unlockedLevel:saved?saved.unlockedLevel:1,
+  history:[],q:{},qIdx:0,correct:0,submitted:false,
+  ans:{root:'',acc:'',quality:''},
+};
+
+function newQ(){
+  const root=ROOT_NAMES[Math.floor(Math.random()*ROOT_NAMES.length)];
+  const qualities=LV_CHORDS[S.level];
+  const quality=qualities[Math.floor(Math.random()*qualities.length)];
+  const notes=generateChordNotes(root,quality);
+  return {root,quality,notes,display:root+Q_DISPLAY[quality]};
+}
+function ansDisplay(){
+  const{root,acc,quality}=S.ans;
+  if(!root)return '';
+  return root+acc+(quality===''?'':Q_DISPLAY[quality]);
+}
+function effectiveQ(){return S.ans.quality===''?'M':S.ans.quality;}
+function canSubmit(){return !S.submitted&&S.ans.root!=='';}
+function checkOk(){
+  const uRoot=S.ans.root+S.ans.acc;
+  const eh={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb','Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
+  const rootOk=uRoot===S.q.root||eh[uRoot]===S.q.root||uRoot===eh[S.q.root];
+  return rootOk&&effectiveQ()===S.q.quality;
+}
+
+// ── Render ────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app');
+  if(S.screen==='start'){renderStart(app);return;}
+  if(S.screen==='summary'){renderSummary(app);return;}
+  renderGame(app);
+}
+
+function renderStart(app){
+  const descs={1:'大三和弦、小三和弦',2:'屬七、大七、小七',3:'六、小六、半減七、減七、增',4:'全部和弦大混合 🎲'};
+  const lvLabels={1:'Level 1',2:'Level 2',3:'Level 3',4:'⚡ 混合關'};
+  const now=new Date(),nm=new Date(now);
+  nm.setHours(24,0,0,0);
+  const diff=nm-now;
+  const hh=Math.floor(diff/3600000),mm=Math.floor((diff%3600000)/60000);
+  app.innerHTML=`<div class="start-screen">
+    <div class="start-title">🎵 和弦辨識練習</div>
+    <div class="start-desc">看五線譜辨識和弦，根音在 C4 到 B4<br>每關 10 題，答對率 90% 才晉級</div>
+    <div class="lv-cards">
+      ${[1,2,3,4].map(lv=>{
+        const locked=lv>S.unlockedLevel,cur=lv===S.unlockedLevel,isMix=lv===4;
+        return `<div class="lv-card${locked?' locked':isMix&&!locked?' mix':cur?' current':''}" onclick="${locked?'':'goLevel('+lv+')'}">
+          <div class="lv-card-title">${lvLabels[lv]} ${locked?'🔒':cur&&!isMix?'▶ 開始':''}</div>
+          <div class="lv-card-desc">${descs[lv]}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="reset-note">闖關紀錄將在 00:00 重置（距離重置 ${hh}h ${mm}m）</div>
+  </div>`;
+}
+
+function goLevel(lv){
+  S={...S,level:lv,qIdx:0,correct:0,history:[],submitted:false,ans:{root:'',acc:'',quality:''},screen:'game'};
+  S.q=newQ();render();tick();
+}
+function tick(){setTimeout(()=>{const el=document.getElementById('stf');if(el)drawStaff(S.q.notes,el);},10);}
+
+function renderGame(app){
+  const ok=S.submitted&&checkOk(),bad=S.submitted&&!ok;
+  const cls=S.submitted?(ok?'correct':'wrong'):'';
+  const lvc=LV_CHORDS[S.level];
+  app.innerHTML=`
+  <div class="hdr">
+    <span class="lv-badge">${S.level===4?'混合關':'Level '+S.level}</span>
+    <span class="hdr-mid">第 ${S.qIdx+1} / 10 題</span>
+    <span class="hdr-score">✓ ${S.correct}</span>
+  </div>
+  <div class="staff-card">
+    <div class="q-label">辨識下列和弦</div>
+    <div id="stf"></div>
+  </div>
+  <div class="answer-box ${cls}">
+    <div>
+      <div class="answer-text">${ansDisplay()||'─'}</div>
+      ${bad?`<div class="correct-ans">正確：${S.q.display}</div>`:''}
+    </div>
+    <div class="feedback-icon">${S.submitted?(ok?'✅':'❌'):'<span style="font-size:11px;color:#bbb">作答區</span>'}</div>
+  </div>
+  <div class="kbd">
+    <div class="kbd-section">
+      <div class="kbd-label">根音</div>
+      <div class="kbd-row">${NOTES.map(n=>`<div class="key${S.ans.root===n?' active':''}" onclick="sr('${n}')">${n}</div>`).join('')}</div>
+    </div>
+    <div class="kbd-section">
+      <div class="kbd-label">升降記號</div>
+      <div class="kbd-row">
+        <div class="key${S.ans.acc==='#'?' active':''}" onclick="sa('#')" style="flex:1">♯ 升</div>
+        <div class="key${S.ans.acc==='b'?' active':''}" onclick="sa('b')" style="flex:1">♭ 降</div>
+      </div>
+    </div>
+    ${qualityGroups.map(g=>`
+    <div class="kbd-section">
+      <div class="kbd-label">${g.label}</div>
+      <div class="kbd-row">${g.keys.map(k=>{
+        const avail=lvc.includes(k);
+        return `<div class="key${S.ans.quality===k?' active':''}${!avail?' dim':''}" onclick="${avail?`sq('${k}')`:''}">${Q_SYMBOL[k]}</div>`;
+      }).join('')}</div>
+    </div>`).join('')}
+    <div class="kbd-row" style="margin-top:2px">
+      <div class="key" style="max-width:120px" onclick="clr()">⌫ 清除</div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn primary" onclick="doSubmit()" ${canSubmit()?'':'disabled'}>送出</button>
+    <button class="btn next-btn" onclick="nextQ()" ${S.submitted?'':'disabled'}>下一題 →</button>
+  </div>`;
+  tick();
+}
+
+function sr(r){if(S.submitted)return;S.ans.root=r;render();}
+function sa(a){if(S.submitted)return;S.ans.acc=(S.ans.acc===a?'':a);render();}
+function sq(q){if(S.submitted)return;S.ans.quality=(S.ans.quality===q?'':q);render();}
+function clr(){if(S.submitted)return;S.ans={root:'',acc:'',quality:''};render();}
+
+function doSubmit(){
+  if(!canSubmit())return;
+  S.submitted=true;
+  const ok=checkOk();
+  if(ok)S.correct++;
+  S.history.push({q:S.q,user:ansDisplay()||S.ans.root,ok});
+  render();
+}
+function nextQ(){
+  if(S.qIdx>=9){S.screen='summary';render();return;}
+  S.qIdx++;S.submitted=false;S.ans={root:'',acc:'',quality:''};S.q=newQ();render();
+}
+function renderSummary(app){
+  const pct=Math.round(S.correct/10*100),passed=pct>=90;
+  if(passed&&S.level<4&&S.level>=S.unlockedLevel){S.unlockedLevel=S.level+1;saveProgress();}
+  const nextMsg=S.level===3&&passed?'🎉 解鎖混合關！':S.level===4&&passed?'🏆 混合關制霸！':passed?`🎉 通過！解鎖 Level ${S.level+1}`:'';
+  app.innerHTML=`<div class="summary">
+    <div style="font-size:16px;font-weight:600;color:#1a1a1a">${S.level===4?'混合關':'Level '+S.level} 結果</div>
+    <div class="sum-stats">
+      <div class="stat-box"><div class="stat-num">${S.correct}</div><div class="stat-lbl">答對</div></div>
+      <div class="stat-box"><div class="stat-num">${10-S.correct}</div><div class="stat-lbl">答錯</div></div>
+      <div class="stat-box"><div class="stat-num">${pct}%</div><div class="stat-lbl">正確率</div></div>
+    </div>
+    <div class="pass-msg ${passed?'pass':'fail'}">${passed?nextMsg||'✅ 通過！':'😅 再加油！需達 90% 才晉級'}</div>
+    <div class="sum-list">${S.history.map((h,i)=>`
+      <div class="sum-item ${h.ok?'ok':'bad'}">
+        <div style="font-size:14px;flex-shrink:0">${h.ok?'✅':'❌'}</div>
+        <div>
+          <div style="font-size:11px;color:#999">題 ${i+1}｜正確：${h.q.display}</div>
+          <div style="font-weight:600;font-size:13px;color:#1a1a1a">${h.user}${!h.ok?' → 正確：'+h.q.display:''}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <button class="btn-full" onclick="S.screen='start';render()">返回選關</button>
+    <button class="btn-sec" onclick="goLevel(${S.level})">再練一次</button>
+  </div>`;
+}
+
+render();
+
+// ── Service Worker (PWA offline support) ─────────────────────────────
+if('serviceWorker' in navigator){
+  const swCode=`
+    const CACHE='chord-quiz-v1';
+    self.addEventListener('install',e=>{
+      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate',e=>{
+      e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch',e=>{
+      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/'))));
+    });
+  `;
+  const blob=new Blob([swCode],{type:'application/javascript'});
+  const swUrl=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+</script>
+</body>
+</html>
