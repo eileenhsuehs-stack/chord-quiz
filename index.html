@@ -193,13 +193,30 @@ const CHORDS={
 };
 
 const LV_POOL={
-  '1':['M','m'],
-  '2':['M','m','+','o','sus4','6','m6','7','M7','m7','mM7','o7','ø7'],
-  '3':['M','m','+','o','sus4','6','m6','7','M7','m7','mM7','o7','ø7'],
-  'mix':['M','m','+','o','sus4','6','m6','7','M7','m7','mM7','o7','ø7'],
-  'extraA':['sus2','add9','madd9','9','M9','m9'],
+  '1':['M','m','sus4'],
+  '2':['M','m','sus4','+','o','M7','m7','mM7','7'],
+  '3':['M','m','sus4','+','o','M7','m7','mM7','7','6','m6','ø7','o7'],
+  'mix':['M','m','sus4','+','o','M7','m7','mM7','7','6','m6','ø7','o7'],
+  'extraA':['add9','madd9','9','M9','m9'],
   'extraB':['+7','+M7','13','m13'],
 };
+
+// Check if a chord combination produces double accidentals
+function hasDoubleAcc(rootKey,cid){
+  const ch=CHORDS[cid];
+  if(!ch)return false;
+  const {name:rootName,dia:rootDia}=parseRoot(rootKey);
+  const rootMidi=ROOT_MIDI_MAP[rootKey];
+  return ch.ds.slice(0,4).some((dStep,i)=>{
+    const semi=ch.iv[i],midi=rootMidi+semi;
+    const targetDia=(rootDia+dStep)%7;
+    const diaOct=Math.floor((rootDia+dStep)/7);
+    const rootOct=Math.floor(rootMidi/12)-1;
+    const tOct=rootOct+diaOct;
+    const natMidi=(tOct+1)*12+DIA_SEMI[targetDia];
+    return Math.abs(midi-natMidi)>=2;
+  });
+}
 
 // Generate staff display notes for a chord
 function genNotes(rootKey,cid){
@@ -323,12 +340,16 @@ function noteNameToStaff(noteName,rootMidi){
 // ══════════════════════════════════════════
 // POOL BUILDER
 // ══════════════════════════════════════════
-function buildPool(levelKey,extraA,extraB){
+function buildPool(levelKey,extraA,extraB,extraC){
   let pool=[...LV_POOL[levelKey]];
   if(extraA)pool=[...new Set([...pool,...LV_POOL.extraA])];
   if(extraB)pool=[...new Set([...pool,...LV_POOL.extraB])];
-  const combos=[];
+  let combos=[];
   ROOT_NAMES.forEach(r=>pool.forEach(c=>combos.push({r,c})));
+  // Filter based on extraC
+  if(!extraC){
+    combos=combos.filter(({r,c})=>!hasDoubleAcc(r,c));
+  }
   for(let i=combos.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[combos[i],combos[j]]=[combos[j],combos[i]];}
   return combos.slice(0,10).map(({r,c})=>({
     root:r,cid:c,
@@ -356,8 +377,8 @@ function loadData(){
 function saveData(){
   try{localStorage.setItem('chord_v5',JSON.stringify({
     nickname:S.nickname,
-    extraA_A:S.extraA_A,extraB_A:S.extraB_A,
-    extraA_B:S.extraA_B,extraB_B:S.extraB_B,
+    extraA_A:S.extraA_A,extraB_A:S.extraB_A,extraC_A:S.extraC_A,
+    extraA_B:S.extraA_B,extraB_B:S.extraB_B,extraC_B:S.extraC_B,
     stats:S.stats,
   }));}catch(e){}
 }
@@ -395,8 +416,8 @@ let S={
   screen:'home',
   game:'A',levelKey:'1',
   nickname:sv?.nickname||'',
-  extraA_A:sv?.extraA_A||false,extraB_A:sv?.extraB_A||false,
-  extraA_B:sv?.extraA_B||false,extraB_B:sv?.extraB_B||false,
+  extraA_A:sv?.extraA_A||false,extraB_A:sv?.extraB_A||false,extraC_A:sv?.extraC_A||false,
+  extraA_B:sv?.extraA_B||false,extraB_B:sv?.extraB_B||false,extraC_B:sv?.extraC_B||false,
   stats:sv?.stats||defaultStats(),
   pool:[],qIdx:0,correct:0,submitted:false,history:[],
   // Game A
@@ -494,12 +515,13 @@ function rLevel(app){
   const isA=S.game==='A';
   const extraA=isA?S.extraA_A:S.extraA_B;
   const extraB=isA?S.extraB_A:S.extraB_B;
+  const extraC=isA?S.extraC_A:S.extraC_B;
   const now=new Date(),nm=new Date(now);nm.setHours(24,0,0,0);
   const diff=nm-now,hh=Math.floor(diff/3600000),mm=Math.floor((diff%3600000)/60000);
   const lvs=[
-    {key:'1',label:'Level 1',desc:'大三、小三'},
-    {key:'2',label:'Level 2',desc:'累積 LV1 ＋ 增、減、sus4、六、小六、七和弦、m△7'},
-    {key:'3',label:'Level 3',desc:'同 LV2 範圍（全混合練習）'},
+    {key:'1',label:'Level 1',desc:'大三（△）、小三（m）、sus4'},
+    {key:'2',label:'Level 2',desc:'累積 LV1 ＋ 增（+）、減（°）、△7、m7、m△7、7'},
+    {key:'3',label:'Level 3',desc:'累積 LV2 ＋ 6、m6、ø7、°7'},
     {key:'mix',label:'⚡ 混合關',desc:'全部和弦大混合 🎲'},
   ];
   app.innerHTML=`<div class="level-screen">
@@ -507,7 +529,7 @@ function rLevel(app){
       <span style="cursor:pointer;font-size:13px;color:#888" onclick="goHome()">← 返回</span>
       <span style="font-size:16px;font-weight:700;color:#1a1a1a">${isA?'🎼 遊戲 A':'🎹 遊戲 B'}｜選擇關卡</span>
     </div>
-    ${extraA||extraB?`<div style="font-size:11px;color:#D97706;padding:6px 10px;background:#FEF3C7;border-radius:8px">⚡ 額外難度已開啟，將融入出題</div>`:''}
+    ${extraA||extraB||extraC?`<div style="font-size:11px;color:#D97706;padding:6px 10px;background:#FEF3C7;border-radius:8px">⚡ 額外難度已開啟（${[extraA?'A':'',extraB?'B':'',extraC?'C':''].filter(Boolean).join('+')}），將融入出題</div>`:''}
     <div class="lv-cards">
       ${lvs.map(lv=>{
         const isMix=lv.key==='mix';
@@ -527,6 +549,10 @@ function rLevel(app){
         <div><div class="toggle-label">🔥 額外 B｜高階爵士</div><div class="toggle-desc">+7、+△7、13、m13</div></div>
         <div class="toggle-switch${extraB?' on':''}" onclick="toggleExtra('B')" id="sw-b"><div class="toggle-knob"></div></div>
       </div>
+      <div class="extra-toggle-row">
+        <div><div class="toggle-label">🎓 額外 C｜重升重降</div><div class="toggle-desc">包含 𝄪 𝄫 的嚴格書寫題目</div></div>
+        <div class="toggle-switch${extraC?' on':''}" onclick="toggleExtra('C')" id="sw-c"><div class="toggle-knob"></div></div>
+      </div>
     </div>
     <div class="reset-note">統計紀錄每日 00:00 重置（距離 ${hh}h ${mm}m）</div>
   </div>`;
@@ -536,12 +562,15 @@ function toggleExtra(which){
   sfxClick();
   const isA=S.game==='A';
   if(which==='A'){if(isA)S.extraA_A=!S.extraA_A;else S.extraA_B=!S.extraA_B;}
-  else{if(isA)S.extraB_A=!S.extraB_A;else S.extraB_B=!S.extraB_B;}
+  else if(which==='B'){if(isA)S.extraB_A=!S.extraB_A;else S.extraB_B=!S.extraB_B;}
+  else{if(isA)S.extraC_A=!S.extraC_A;else S.extraC_B=!S.extraC_B;}
   saveData();
   const extraA=isA?S.extraA_A:S.extraA_B;
   const extraB=isA?S.extraB_A:S.extraB_B;
+  const extraC=isA?S.extraC_A:S.extraC_B;
   const swa=document.getElementById('sw-a');if(swa)swa.className='toggle-switch'+(extraA?' on':'');
   const swb=document.getElementById('sw-b');if(swb)swb.className='toggle-switch'+(extraB?' on':'');
+  const swc=document.getElementById('sw-c');if(swc)swc.className='toggle-switch'+(extraC?' on':'');
 }
 
 function startGame(lvKey){
@@ -550,7 +579,7 @@ function startGame(lvKey){
   const extraA=isA?S.extraA_A:S.extraA_B;
   const extraB=isA?S.extraB_A:S.extraB_B;
   S={...S,levelKey:lvKey,
-    pool:buildPool(lvKey,extraA,extraB),
+    pool:buildPool(lvKey,extraA,extraB,isA?S.extraC_A:S.extraC_B),
     qIdx:0,correct:0,submitted:false,history:[],
     ansRoot:'',ansAcc:'',ansQuality:'',ansExt:'',ansMaj:false,
     bNotes:[],bPending:'',bPendingAcc:'',
