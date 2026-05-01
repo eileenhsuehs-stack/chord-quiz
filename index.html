@@ -7,50 +7,46 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="和弦練習">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#f5f5f0">
 <title>和弦辨識練習</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;}
 #app{max-width:440px;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:100vh;}
 
-/* Header */
+/* ── Shared ── */
 .hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:1px solid #e8e6de;border-radius:14px;}
 .lv-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#E1F5EE;color:#085041;}
+.lv-badge.b{background:#EDE9FE;color:#3B0764;}
 .hdr-mid{font-size:13px;color:#888;}
 .hdr-score{font-size:13px;font-weight:600;color:#1a1a1a;}
+.hdr-back{font-size:12px;color:#1D9E75;font-weight:500;cursor:pointer;padding:2px 0;}
 
-/* Staff card */
 .staff-card{background:#fff;border:1px solid #e8e6de;border-radius:14px;padding:14px 12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .q-label{font-size:11px;color:#999;}
 
-/* Answer box */
-.answer-box{background:#f5f5f0;border:1px solid #e8e6de;border-radius:10px;padding:10px 14px;min-height:56px;display:flex;align-items:center;justify-content:space-between;transition:background 0.25s,border-color 0.25s;}
+.answer-box{background:#f5f5f0;border:1px solid #e8e6de;border-radius:10px;padding:10px 14px;min-height:56px;display:flex;align-items:center;justify-content:space-between;}
 .answer-box.correct{background:#EAF3DE;border-color:#97C459;}
 .answer-box.wrong{background:#FCEBEB;border-color:#F09595;}
 .answer-text{font-size:24px;font-weight:600;letter-spacing:1px;min-height:30px;color:#1a1a1a;}
 .correct-ans{font-size:11px;color:#A32D2D;margin-top:3px;}
-.feedback-icon{font-size:22px;}
 
-/* Keyboard */
 .kbd{background:#fff;border:1px solid #e8e6de;border-radius:14px;padding:10px;}
 .kbd-section{margin-bottom:8px;}
 .kbd-label{font-size:10px;color:#bbb;margin-bottom:5px;letter-spacing:0.8px;text-transform:uppercase;}
 .kbd-row{display:flex;flex-wrap:wrap;gap:5px;}
-.key{font-size:13px;font-weight:500;padding:8px 2px;border:1px solid #ddd;border-radius:8px;cursor:pointer;background:#f5f5f0;color:#1a1a1a;text-align:center;user-select:none;flex:1;transition:all 0.1s;-webkit-user-select:none;}
-.key:active{transform:scale(0.94);background:#e8e8e4;}
+.key{font-size:13px;font-weight:500;padding:8px 2px;border:1px solid #ddd;border-radius:8px;cursor:pointer;background:#f5f5f0;color:#1a1a1a;text-align:center;user-select:none;flex:1;-webkit-user-select:none;}
 .key.active{background:#1D9E75;color:#fff;border-color:#0F6E56;}
-.key.dim{opacity:0.28;cursor:default;}
+.key.active.b{background:#7C3AED;border-color:#5B21B6;}
+.key.dim{opacity:0.25;cursor:default;}
 
-/* Actions */
 .actions{display:flex;gap:8px;}
-.btn{flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.15s;background:#f5f5f0;color:#1a1a1a;}
-.btn:active{transform:scale(0.97);}
+.btn{flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:15px;font-weight:600;cursor:pointer;background:#f5f5f0;color:#1a1a1a;}
 .btn.primary{background:#1D9E75;color:#fff;border-color:#0F6E56;}
+.btn.primary.b{background:#7C3AED;border-color:#5B21B6;}
 .btn.primary:disabled{background:#f0f0ec;color:#bbb;border-color:#e0e0da;cursor:default;}
 .btn.next-btn:disabled{opacity:0.38;cursor:default;}
 
-/* Summary */
 .summary{background:#fff;border:1px solid #e8e6de;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;}
 .sum-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .stat-box{background:#f5f5f0;border-radius:10px;padding:10px;text-align:center;}
@@ -64,305 +60,691 @@ html,body{height:100%;background:#f5f5f0;font-family:-apple-system,BlinkMacSyste
 .pass-msg.pass{background:#EAF3DE;color:#085041;}
 .pass-msg.fail{background:#FCEBEB;color:#791F1F;}
 .btn-full{width:100%;padding:13px;border-radius:10px;border:1px solid #0F6E56;background:#1D9E75;color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+.btn-full.b{border-color:#5B21B6;background:#7C3AED;}
 .btn-sec{width:100%;padding:13px;border-radius:10px;border:1px solid #ddd;background:#f5f5f0;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;}
 
-/* Start screen */
-.start-screen{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 8px;}
-.start-title{font-size:24px;font-weight:700;text-align:center;color:#1a1a1a;}
-.start-desc{font-size:13px;color:#888;text-align:center;line-height:1.7;}
-.lv-cards{width:100%;display:flex;flex-direction:column;gap:8px;}
-.lv-card{padding:13px 16px;border:1px solid #e8e6de;border-radius:14px;background:#f5f5f0;cursor:pointer;transition:all 0.15s;}
+/* ── Home ── */
+.home-screen{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 8px;}
+.home-title{font-size:26px;font-weight:700;text-align:center;color:#1a1a1a;}
+.home-subtitle{font-size:13px;color:#888;text-align:center;line-height:1.7;}
+.game-cards{width:100%;display:flex;flex-direction:column;gap:10px;}
+.game-card{padding:16px;border:1px solid #e8e6de;border-radius:16px;background:#fff;cursor:pointer;}
+.game-card:active{transform:scale(0.98);}
+.game-card.a{border-left:4px solid #1D9E75;}
+.game-card.b{border-left:4px solid #7C3AED;}
+.game-card-title{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+.game-card-desc{font-size:12px;color:#888;line-height:1.6;}
+
+/* ── Level Select ── */
+.level-screen{display:flex;flex-direction:column;gap:10px;padding:8px 0;}
+.level-screen-title{font-size:16px;font-weight:700;color:#1a1a1a;padding:0 4px;}
+.lv-cards{display:flex;flex-direction:column;gap:8px;}
+.lv-card{padding:13px 16px;border:1px solid #e8e6de;border-radius:14px;background:#f5f5f0;cursor:pointer;}
 .lv-card:active{transform:scale(0.98);}
-.lv-card.locked{opacity:0.38;cursor:default;}
-.lv-card.current{border-color:#1D9E75;background:#E1F5EE;}
-.lv-card.mix{border-color:#7F77DD;background:#EEEDFE;}
+.lv-card.a-theme{border-color:#1D9E75;background:#E1F5EE;}
+.lv-card.b-theme{border-color:#7C3AED;background:#EDE9FE;}
+.lv-card.mix-a{border-color:#1D9E75;background:#E1F5EE;}
+.lv-card.mix-b{border-color:#7C3AED;background:#EDE9FE;}
+.lv-card.extra{border-color:#D97706;background:#FEF3C7;}
 .lv-card-title{font-size:14px;font-weight:600;color:#1a1a1a;}
 .lv-card-desc{font-size:12px;color:#888;margin-top:3px;}
-.reset-note{font-size:11px;color:#bbb;text-align:center;}
+.extra-section-title{font-size:11px;color:#bbb;letter-spacing:0.8px;padding:4px 4px 0;text-transform:uppercase;}
+.reset-note{font-size:11px;color:#bbb;text-align:center;padding:4px 0;}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-// ── Music theory ──────────────────────────────────────────────────────
-const CHORD_DEFS={
-  'M':{intervals:[0,4,7]},'m':{intervals:[0,3,7]},
-  '7':{intervals:[0,4,7,10]},'M7':{intervals:[0,4,7,11]},'m7':{intervals:[0,3,7,10]},
-  '6':{intervals:[0,4,7,9]},'m6':{intervals:[0,3,7,9]},
-  'ø7':{intervals:[0,3,6,10]},'o7':{intervals:[0,3,6,9]},
-  '+':{intervals:[0,4,8]},'sus4':{intervals:[0,5,7]},
-};
-const LV_CHORDS={
-  1:['M','m'],
-  2:['7','M7','m7'],
-  3:['6','m6','ø7','o7','+'],
-  4:['M','m','7','M7','m7','6','m6','ø7','o7','+'],
-};
-const Q_SYMBOL={'M':'maj','m':'min','7':'dom7','M7':'△7','m7':'m7','6':'6','m6':'m6','ø7':'ø7','o7':'°7','+':'aug','sus4':'sus4'};
-const Q_DISPLAY={'M':'','m':'m','7':'7','M7':'△7','m7':'m7','6':'6','m6':'m6','ø7':'ø7','o7':'°7','+':'+','sus4':'sus4'};
-const qualityGroups=[
-  {label:'基礎',keys:['M','m']},
-  {label:'七和弦',keys:['7','M7','m7']},
-  {label:'進階',keys:['6','m6','ø7','o7','+','sus4']},
-];
+// ══════════════════════════════════════════════════════════════
+// AUDIO ENGINE
+// ══════════════════════════════════════════════════════════════
+let _actx=null;
+function actx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();return _actx;}
+function tone(freq,type,vol,atk,dec){
+  try{
+    const c=actx(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type=type;o.frequency.value=freq;
+    const t=c.currentTime;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+atk);
+    g.gain.exponentialRampToValueAtTime(0.001,t+atk+dec);
+    o.start(t);o.stop(t+atk+dec+0.05);
+  }catch(e){}
+}
+function pianoNote(midi,vol=0.16,delay=0){
+  try{
+    const c=actx(),f=440*Math.pow(2,(midi-69)/12),t=c.currentTime+delay;
+    [[1,1],[2,0.5],[3,0.25],[4,0.12],[6,0.05]].forEach(([h,hv])=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);
+      o.type='sine';o.frequency.value=f*h;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(vol*hv,t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,t+1.2);
+      o.start(t);o.stop(t+1.3);
+    });
+  }catch(e){}
+}
+const sfxClick=()=>tone(800,'sine',0.05,0.005,0.07);
+const sfxCorrect=()=>{tone(523,'sine',0.14,0.01,0.2);setTimeout(()=>tone(659,'sine',0.14,0.01,0.2),80);setTimeout(()=>tone(784,'sine',0.14,0.01,0.28),160);};
+const sfxWrong=()=>{tone(220,'sawtooth',0.11,0.01,0.28);setTimeout(()=>tone(196,'sawtooth',0.09,0.01,0.22),120);};
+const sfxLevelUp=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,'sine',0.16,0.01,0.25),i*100));
+function playChord(midis){midis.forEach((m,i)=>pianoNote(m,0.15,i*0.02));}
+
+// ══════════════════════════════════════════════════════════════
+// MUSIC THEORY
+// ══════════════════════════════════════════════════════════════
 const ROOT_MIDI={'C':60,'C#':61,'D':62,'D#':63,'E':64,'F':65,'F#':66,'G':67,'G#':68,'A':69,'A#':70,'B':71};
 const ROOT_NAMES=Object.keys(ROOT_MIDI);
 const NOTES=['C','D','E','F','G','A','B'];
 const DIA_SEMI=[0,2,4,5,7,9,11];
 const NAME_TO_DIA={C:0,D:1,E:2,F:3,G:4,A:5,B:6};
-const QUALITY_DIA_STEPS={
-  'M':[0,2,4],'m':[0,2,4],
-  '7':[0,2,4,6],'M7':[0,2,4,6],'m7':[0,2,4,6],
-  '6':[0,2,4,5],'m6':[0,2,4,5],
-  'ø7':[0,2,4,6],'o7':[0,2,4,6],
-  '+':[0,2,4],'sus4':[0,3,4],
+
+// Chord definitions: {intervals, diaSteps, display}
+// display: function(quality,major) => string shown in answer/title
+const CHORDS={
+  // key: internal id
+  'M':      {iv:[0,4,7],   ds:[0,2,4],       disp:r=>r},
+  'm':      {iv:[0,3,7],   ds:[0,2,4],       disp:r=>r+'m'},
+  '+':      {iv:[0,4,8],   ds:[0,2,4],       disp:r=>r+'+'},
+  'o':      {iv:[0,3,6],   ds:[0,2,4],       disp:r=>r+'°'},
+  'sus4':   {iv:[0,5,7],   ds:[0,3,4],       disp:r=>r+'sus4'},
+  'sus2':   {iv:[0,2,7],   ds:[0,1,4],       disp:r=>r+'sus2'},
+  '6':      {iv:[0,4,7,9], ds:[0,2,4,5],     disp:r=>r+'6'},
+  'm6':     {iv:[0,3,7,9], ds:[0,2,4,5],     disp:r=>r+'m6'},
+  '7':      {iv:[0,4,7,10],ds:[0,2,4,6],     disp:r=>r+'7'},
+  'M7':     {iv:[0,4,7,11],ds:[0,2,4,6],     disp:r=>r+'△7'},
+  'm7':     {iv:[0,3,7,10],ds:[0,2,4,6],     disp:r=>r+'m7'},
+  'mM7':    {iv:[0,3,7,11],ds:[0,2,4,6],     disp:r=>r+'m△7'},
+  'o7':     {iv:[0,3,6,9], ds:[0,2,4,6],     disp:r=>r+'°7'},
+  'ø7':     {iv:[0,3,6,10],ds:[0,2,4,6],     disp:r=>r+'ø7'},
+  '+7':     {iv:[0,4,8,10],ds:[0,2,4,6],     disp:r=>r+'+7'},
+  '+M7':    {iv:[0,4,8,11],ds:[0,2,4,6],     disp:r=>r+'+△7'},
+  'add9':   {iv:[0,4,7,14],ds:[0,2,4,9],     disp:r=>r+'add9'},
+  'madd9':  {iv:[0,3,7,14],ds:[0,2,4,9],     disp:r=>r+'madd9'},
+  '9':      {iv:[0,4,7,10,14],ds:[0,2,4,6,9],disp:r=>r+'9'},
+  'M9':     {iv:[0,4,7,11,14],ds:[0,2,4,6,9],disp:r=>r+'△9'},
+  'm9':     {iv:[0,3,7,10,14],ds:[0,2,4,6,9],disp:r=>r+'m9'},
+  '13':     {iv:[0,4,7,10,14,21],ds:[0,2,4,6,9,12],disp:r=>r+'13'},
+  'm13':    {iv:[0,3,7,10,14,21],ds:[0,2,4,6,9,12],disp:r=>r+'m13'},
 };
 
-function generateChordNotes(rootKey,quality){
+// Level pools — cumulative
+const LV_POOL={
+  1:['M','m'],
+  2:['M','m','+','o','sus4','6','m6','7','M7','m7','mM7','o7','ø7'],
+  3:['M','m','+','o','sus4','6','m6','7','M7','m7','mM7','o7','ø7'],
+  'mix':['M','m','+','o','sus4','6','m6','7','M7','m7','mM7','o7','ø7'],
+  'extraA':['M','m','sus2','add9','madd9','9','M9','m9'],
+  'extraB':['M','m','+7','+M7','13','m13'],
+};
+// LV2 new additions vs LV1
+const LV_NEW={
+  1:['M','m'],
+  2:['+','o','sus4','6','m6','7','M7','m7','mM7','o7','ø7'],
+  3:[], // same pool as 2 but harder (all cumulative)
+};
+
+// ── Note generation ──
+function genNotes(rootKey,cid){
+  const ch=CHORDS[cid];
   const rootMidi=ROOT_MIDI[rootKey];
   const rootDia=NAME_TO_DIA[rootKey[0]];
-  const diaSteps=QUALITY_DIA_STEPS[quality];
-  const intervals=CHORD_DEFS[quality].intervals;
-  return diaSteps.map((dStep,i)=>{
-    const semi=intervals[i];
-    const midi=rootMidi+semi;
+  const displayCount=Math.min(4,ch.ds.length);
+  return ch.ds.slice(0,displayCount).map((dStep,i)=>{
+    const semi=ch.iv[i],midi=rootMidi+semi;
     const targetDia=(rootDia+dStep)%7;
-    const diaOctaveCross=Math.floor((rootDia+dStep)/7);
-    const rootOctave=Math.floor(rootMidi/12)-1;
-    const targetOctave=rootOctave+diaOctaveCross;
-    const naturalMidi=(targetOctave+1)*12+DIA_SEMI[targetDia];
-    const accDiff=midi-naturalMidi;
+    const diaOct=Math.floor((rootDia+dStep)/7);
+    const rootOct=Math.floor(rootMidi/12)-1;
+    const tOct=rootOct+diaOct;
+    const natMidi=(tOct+1)*12+DIA_SEMI[targetDia];
+    const diff=midi-natMidi;
     let acc='';
-    if(accDiff===1)acc='#';
-    else if(accDiff===-1)acc='b';
-    else if(accDiff===2)acc='x';
-    else if(accDiff===-2)acc='bb';
-    const slot=(targetOctave-4)*7+(targetDia-2);
-    return {midi,slot,acc};
+    if(diff===1)acc='#';else if(diff===-1)acc='b';
+    else if(diff===2)acc='x';else if(diff===-2)acc='bb';
+    return {midi,slot:(tOct-4)*7+(targetDia-2),acc};
   });
 }
 
-function doubleSharpSVG(cx,cy,ink){
+// All midi notes for a chord (for audio)
+function allMidi(rootKey,cid){
+  return CHORDS[cid].iv.map(i=>ROOT_MIDI[rootKey]+i);
+}
+
+// ── Staff drawing ──
+function dblSharp(cx,cy,ink){
   const s=5;
   return `<line x1="${cx-s}" y1="${cy-s}" x2="${cx+s}" y2="${cy+s}" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>
-          <line x1="${cx+s}" y1="${cy-s}" x2="${cx-s}" y2="${cy+s}" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>`;
+<line x1="${cx+s}" y1="${cy-s}" x2="${cx-s}" y2="${cy+s}" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>`;
 }
-
-function drawStaff(notes,container){
-  const W=300,HALF=10;
-  const BASE_Y=112;
-  const slotY=s=>BASE_Y-s*HALF;
-  const STAFF_SLOTS=[0,2,4,6,8];
-  const ink='#1a1a1a';
-  const bg='#ffffff';
-  const RX=10,RY=7.5;
-  const NX_BASE=195;
-  const ACC_X=NX_BASE-RX-14;
+function drawStaff(notes,container,highlight=[]){
+  const W=300,H=10,BASE_Y=112,SL=[0,2,4,6,8];
+  const sy=s=>BASE_Y-s*H,ink='#1a1a1a',bg='#ffffff';
+  const RX=10,RY=7.5,NX=195,AX=NX-RX-14;
   const sorted=[...notes].sort((a,b)=>a.slot-b.slot);
-  const positions=sorted.map((n,i)=>{
-    let nx=NX_BASE;
-    if(i>0&&Math.abs(n.slot-sorted[i-1].slot)===1)nx=NX_BASE+RX*2+2;
-    return {...n,nx};
+  const pos=sorted.map((n,i)=>({...n,nx:i>0&&Math.abs(n.slot-sorted[i-1].slot)===1?NX+RX*2+2:NX}));
+  const ledge=new Set();
+  sorted.forEach(n=>{
+    if(n.slot<=-2)for(let s=-2;s>=n.slot;s-=2)ledge.add(s);
+    if(n.slot>=10)for(let s=10;s<=n.slot;s+=2)ledge.add(s);
   });
-  const ledgerSet=new Set();
-  for(const n of sorted){
-    if(n.slot<=-2){for(let s=-2;s>=n.slot;s-=2)ledgerSet.add(s);}
-    if(n.slot>=10){for(let s=10;s<=n.slot;s+=2)ledgerSet.add(s);}
-  }
   let svg=`<svg viewBox="0 0 ${W} 150" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block;">`;
   svg+=`<rect width="${W}" height="150" fill="transparent"/>`;
-  for(const s of STAFF_SLOTS){
-    const y=slotY(s);
-    svg+=`<line x1="30" y1="${y}" x2="${W-8}" y2="${y}" stroke="${ink}" stroke-width="1" opacity="0.6"/>`;
-  }
-  svg+=`<text x="10" y="${slotY(0)+16}" font-size="100" fill="${ink}" font-family="serif" dominant-baseline="auto" opacity="0.8">𝄞</text>`;
-  for(const s of ledgerSet){
-    const y=slotY(s);
-    const maxNx=Math.max(NX_BASE,...positions.filter(n=>Math.abs(n.slot-s)<=1).map(n=>n.nx));
-    svg+=`<line x1="${NX_BASE-RX-5}" y1="${y}" x2="${maxNx+RX+5}" y2="${y}" stroke="${ink}" stroke-width="1"/>`;
-  }
-  for(const n of positions){
-    const y=slotY(n.slot);
-    const nx=n.nx;
-    if(n.acc==='#'){
-      svg+=`<text x="${ACC_X}" y="${y+5}" font-size="15" fill="${ink}" text-anchor="middle" font-family="serif">♯</text>`;
-    }else if(n.acc==='b'){
-      svg+=`<text x="${ACC_X}" y="${y+7}" font-size="17" fill="${ink}" text-anchor="middle" font-family="serif">♭</text>`;
-    }else if(n.acc==='x'){
-      svg+=doubleSharpSVG(ACC_X,y,ink);
-    }else if(n.acc==='bb'){
-      svg+=`<text x="${ACC_X-2}" y="${y+7}" font-size="13" fill="${ink}" text-anchor="middle" font-family="serif">♭♭</text>`;
-    }
-    svg+=`<ellipse cx="${nx}" cy="${y}" rx="${RX}" ry="${RY}" fill="${ink}" transform="rotate(-10,${nx},${y})"/>`;
+  SL.forEach(s=>{const y=sy(s);svg+=`<line x1="30" y1="${y}" x2="${W-8}" y2="${y}" stroke="${ink}" stroke-width="1" opacity="0.6"/>`;});
+  svg+=`<text x="10" y="${sy(0)+16}" font-size="100" fill="${ink}" font-family="serif" dominant-baseline="auto" opacity="0.8">𝄞</text>`;
+  ledge.forEach(s=>{
+    const y=sy(s);
+    const mx=Math.max(NX,...pos.filter(n=>Math.abs(n.slot-s)<=1).map(n=>n.nx));
+    svg+=`<line x1="${NX-RX-5}" y1="${y}" x2="${mx+RX+5}" y2="${y}" stroke="${ink}" stroke-width="1"/>`;
+  });
+  pos.forEach(n=>{
+    const y=sy(n.slot),nx=n.nx;
+    const hi=highlight.includes(n.midi);
+    const nc=hi?'#7C3AED':ink;
+    if(n.acc==='#')svg+=`<text x="${AX}" y="${y+5}" font-size="15" fill="${nc}" text-anchor="middle" font-family="serif">♯</text>`;
+    else if(n.acc==='b')svg+=`<text x="${AX}" y="${y+7}" font-size="17" fill="${nc}" text-anchor="middle" font-family="serif">♭</text>`;
+    else if(n.acc==='x')svg+=dblSharp(AX,y,nc);
+    else if(n.acc==='bb')svg+=`<text x="${AX-2}" y="${y+7}" font-size="14" fill="${nc}" text-anchor="middle" font-family="serif">𝄫</text>`;
+    svg+=`<ellipse cx="${nx}" cy="${y}" rx="${RX}" ry="${RY}" fill="${nc}" transform="rotate(-10,${nx},${y})"/>`;
     svg+=`<ellipse cx="${nx}" cy="${y}" rx="${RX*0.42}" ry="${RY*0.55}" fill="${bg}" transform="rotate(-10,${nx},${y})"/>`;
-  }
+  });
   svg+='</svg>';
   container.innerHTML=svg;
 }
 
-// ── Daily reset ───────────────────────────────────────────────────────
-function todayKey(){const d=new Date();return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
-function loadProgress(){
-  try{
-    const raw=localStorage.getItem('chord_progress');
-    if(!raw)return null;
-    const data=JSON.parse(raw);
-    if(data.day!==todayKey())return null;
-    return data;
-  }catch(e){return null;}
-}
-function saveProgress(){
-  try{localStorage.setItem('chord_progress',JSON.stringify({day:todayKey(),unlockedLevel:S.unlockedLevel}));}catch(e){}
+// ══════════════════════════════════════════════════════════════
+// QUESTION POOL (no repeat within 10)
+// ══════════════════════════════════════════════════════════════
+function buildPool(levelKey,extraA,extraB){
+  let pool=[...LV_POOL[levelKey]];
+  if(extraA)pool=[...new Set([...pool,...LV_POOL.extraA])];
+  if(extraB)pool=[...new Set([...pool,...LV_POOL.extraB])];
+  const combos=[];
+  ROOT_NAMES.forEach(r=>pool.forEach(c=>combos.push({r,c})));
+  for(let i=combos.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[combos[i],combos[j]]=[combos[j],combos[i]];}
+  return combos.slice(0,10).map(({r,c})=>({
+    root:r,cid:c,
+    notes:genNotes(r,c),
+    midis:allMidi(r,c),
+    display:CHORDS[c].disp(r),
+  }));
 }
 
-// ── State ─────────────────────────────────────────────────────────────
-const saved=loadProgress();
+// ══════════════════════════════════════════════════════════════
+// PERSIST
+// ══════════════════════════════════════════════════════════════
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
+function loadSave(){
+  try{const r=localStorage.getItem('chord_v3');if(!r)return null;const d=JSON.parse(r);if(d.day!==todayKey())return null;return d;}catch(e){return null;}
+}
+function persist(){
+  try{localStorage.setItem('chord_v3',JSON.stringify({day:todayKey(),unlockedA:S.unlockedA,unlockedB:S.unlockedB}));}catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════════════════════════
+const sv=loadSave();
 let S={
-  screen:'start',level:1,unlockedLevel:saved?saved.unlockedLevel:1,
-  history:[],q:{},qIdx:0,correct:0,submitted:false,
-  ans:{root:'',acc:'',quality:''},
+  screen:'home', // home | levelA | levelB | gameA | gameB | summaryA | summaryB
+  game:'A',
+  level:1, levelKey:'1',
+  extraA:false, extraB:false,
+  pool:[], qIdx:0, correct:0, submitted:false,
+  history:[],
+  unlockedA: sv?sv.unlockedA:1,
+  unlockedB: sv?sv.unlockedB:1,
+  // Game A answer
+  ansRoot:'', ansAcc:'', ansQuality:'', ansExt:'', ansMaj:false,
+  // Game B answer (set of midi note numbers entered)
+  bNotes:[],
 };
 
-function newQ(){
-  const root=ROOT_NAMES[Math.floor(Math.random()*ROOT_NAMES.length)];
-  const qualities=LV_CHORDS[S.level];
-  const quality=qualities[Math.floor(Math.random()*qualities.length)];
-  const notes=generateChordNotes(root,quality);
-  return {root,quality,notes,display:root+Q_DISPLAY[quality]};
-}
-function ansDisplay(){
-  const{root,acc,quality}=S.ans;
-  if(!root)return '';
-  return root+acc+(quality===''?'':Q_DISPLAY[quality]);
-}
-function effectiveQ(){return S.ans.quality===''?'M':S.ans.quality;}
-function canSubmit(){return !S.submitted&&S.ans.root!=='';}
-function checkOk(){
-  const uRoot=S.ans.root+S.ans.acc;
-  const eh={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb','Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
-  const rootOk=uRoot===S.q.root||eh[uRoot]===S.q.root||uRoot===eh[S.q.root];
-  return rootOk&&effectiveQ()===S.q.quality;
+// ══════════════════════════════════════════════════════════════
+// GAME A — ANSWER LOGIC
+// ══════════════════════════════════════════════════════════════
+function aAnsDisplay(){
+  const{ansRoot:r,ansAcc:ac,ansQuality:q,ansMaj:maj,ansExt:ext}=S;
+  if(!r)return '';
+  let s=r+ac;
+  if(q)s+=q==='o'?'°':q==='ø'?'ø':q;
+  if(maj)s+='△';
+  if(ext)s+=ext;
+  return s;
 }
 
-// ── Render ────────────────────────────────────────────────────────────
+// Build the chord id from answer buttons
+function aEffectiveCid(){
+  const{ansQuality:q,ansMaj:maj,ansExt:ext}=S;
+  // No quality + no ext = major triad
+  if(!q&&!ext&&!maj)return 'M';
+  // sus
+  if(q==='sus4'&&!ext)return 'sus4';
+  if(q==='sus2'&&!ext)return 'sus2';
+  // build key
+  let key='';
+  if(!q||q==='')key='';
+  else if(q==='o')key='o';
+  else if(q==='ø')key='ø';
+  else if(q==='+')key='+';
+  else if(q==='m')key='m';
+  // add ext
+  const majMark=maj?'M':'';
+  if(!ext)return key||'M';
+  if(ext==='6'){
+    if(key==='m')return 'm6';
+    return '6';
+  }
+  if(ext==='7'){
+    if(key==='o')return 'o7';
+    if(key==='ø')return 'ø7';
+    if(key==='+')return majMark?'+M7':'+7';
+    if(key==='m')return majMark?'mM7':'m7';
+    return majMark?'M7':'7';
+  }
+  if(ext==='9'){
+    if(key==='m')return 'm9';
+    return majMark?'M9':'9';
+  }
+  if(ext==='add9'){
+    if(key==='m')return 'madd9';
+    return 'add9';
+  }
+  if(ext==='13'){
+    if(key==='m')return 'm13';
+    return '13';
+  }
+  return 'M';
+}
+
+function aCanSubmit(){return !S.submitted&&S.ansRoot!=='';}
+function aCheckOk(){
+  const q=S.pool[S.qIdx];
+  const uRoot=S.ansRoot+S.ansAcc;
+  const eh={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb','Db':'C#','Eb':'D#','Gb':'F#','Ab':'G#','Bb':'A#'};
+  const rootOk=uRoot===q.root||eh[uRoot]===q.root||uRoot===eh[q.root];
+  return rootOk&&aEffectiveCid()===q.cid;
+}
+
+// ══════════════════════════════════════════════════════════════
+// GAME B — ANSWER LOGIC
+// ══════════════════════════════════════════════════════════════
+// bNotes: array of midi numbers (all in octave 4, C4=60..B4=71)
+function bCheckOk(){
+  const q=S.pool[S.qIdx];
+  const expected=new Set(q.midis.map(m=>((m-60)%12+12)%12));
+  const entered=new Set(S.bNotes.map(m=>((m-60)%12+12)%12));
+  if(expected.size!==entered.size)return false;
+  for(const v of expected)if(!entered.has(v))return false;
+  return true;
+}
+function bCanSubmit(){return !S.submitted&&S.bNotes.length>0;}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER ROUTER
+// ══════════════════════════════════════════════════════════════
 function render(){
   const app=document.getElementById('app');
-  if(S.screen==='start'){renderStart(app);return;}
-  if(S.screen==='summary'){renderSummary(app);return;}
-  renderGame(app);
+  const s=S.screen;
+  if(s==='home')return renderHome(app);
+  if(s==='levelA')return renderLevelSelect(app,'A');
+  if(s==='levelB')return renderLevelSelect(app,'B');
+  if(s==='gameA'){if(!document.getElementById('game-root'))renderGameA(app);else updateGameA();return;}
+  if(s==='gameB'){if(!document.getElementById('game-root'))renderGameB(app);else updateGameB();return;}
+  if(s==='summaryA'||s==='summaryB')return renderSummary(app);
 }
 
-function renderStart(app){
-  const descs={1:'大三和弦、小三和弦',2:'屬七、大七、小七',3:'六、小六、半減七、減七、增',4:'全部和弦大混合 🎲'};
-  const lvLabels={1:'Level 1',2:'Level 2',3:'Level 3',4:'⚡ 混合關'};
-  const now=new Date(),nm=new Date(now);
-  nm.setHours(24,0,0,0);
-  const diff=nm-now;
-  const hh=Math.floor(diff/3600000),mm=Math.floor((diff%3600000)/60000);
-  app.innerHTML=`<div class="start-screen">
-    <div class="start-title">🎵 和弦辨識練習</div>
-    <div class="start-desc">看五線譜辨識和弦，根音在 C4 到 B4<br>每關 10 題，答對率 90% 才晉級</div>
+// ══════════════════════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════════════════════
+function renderHome(app){
+  app.innerHTML=`<div class="home-screen">
+    <div class="home-title">🎵 和弦練習</div>
+    <div class="home-subtitle">每關 10 題，答對率 90% 才晉級<br>闖關紀錄每日 00:00 重置</div>
+    <div class="game-cards">
+      <div class="game-card a" onclick="goLevelSelect('A')">
+        <div class="game-card-title">🎼 遊戲 A｜和弦辨識</div>
+        <div class="game-card-desc">看五線譜上的音符組合 → 辨識是什麼和弦<br>考驗你的音程辨識能力</div>
+      </div>
+      <div class="game-card b" onclick="goLevelSelect('B')">
+        <div class="game-card-title">🎹 遊戲 B｜音符拼出</div>
+        <div class="game-card-desc">看到和弦名稱 → 按出正確的音符組成<br>考驗你對和弦結構的記憶</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// LEVEL SELECT
+// ══════════════════════════════════════════════════════════════
+function renderLevelSelect(app,game){
+  const isA=game==='A';
+  const unlocked=isA?S.unlockedA:S.unlockedB;
+  const th=isA?'a-theme':'b-theme';
+  const now=new Date(),nm=new Date(now);nm.setHours(24,0,0,0);
+  const diff=nm-now,hh=Math.floor(diff/3600000),mm=Math.floor((diff%3600000)/60000);
+  const lvDescs=isA?{
+    1:'大三、小三',
+    2:'累積 LV1 ＋ 增、減、sus4、六、小六、七和弦、m△7',
+    3:'同 LV2（全和弦混合）',
+    mix:'全部和弦大混合 🎲',
+  }:{
+    1:'大三、小三',
+    2:'累積 LV1 ＋ 增、減、sus4、六、小六、七和弦、m△7',
+    3:'同 LV2（全和弦混合）',
+    mix:'全部和弦大混合 🎲',
+  };
+  const lvKeys=[1,2,3,'mix'];
+  const lvLabels={1:'Level 1',2:'Level 2',3:'Level 3',mix:'⚡ 混合關'};
+  app.innerHTML=`<div class="level-screen">
+    <div style="display:flex;align-items:center;gap:10px;padding:0 4px">
+      <div style="cursor:pointer;font-size:13px;color:#888" onclick="goHome()">← 返回</div>
+      <div class="level-screen-title">${isA?'🎼 遊戲 A｜選擇關卡':'🎹 遊戲 B｜選擇關卡'}</div>
+    </div>
     <div class="lv-cards">
-      ${[1,2,3,4].map(lv=>{
-        const locked=lv>S.unlockedLevel,cur=lv===S.unlockedLevel,isMix=lv===4;
-        return `<div class="lv-card${locked?' locked':isMix&&!locked?' mix':cur?' current':''}" onclick="${locked?'':'goLevel('+lv+')'}">
-          <div class="lv-card-title">${lvLabels[lv]} ${locked?'🔒':cur&&!isMix?'▶ 開始':''}</div>
-          <div class="lv-card-desc">${descs[lv]}</div>
+      ${lvKeys.map((lv,i)=>{
+        const locked=i>unlocked-1+(i===3?1:0)&&!(lv==='mix'&&unlocked>=3);
+        const isCur=i===unlocked-1||(lv==='mix'&&unlocked>=3&&i===3);
+        const isMix=lv==='mix';
+        return `<div class="lv-card${locked?'':isMix?' mix-'+game.toLowerCase():isCur?' '+th:''}" 
+          onclick="${locked?'':'startGame(\''+game+'\',\''+lv+'\')'}">
+          <div class="lv-card-title">${lvLabels[lv]} ${locked?'🔒':isCur&&!isMix?'▶':''}</div>
+          <div class="lv-card-desc">${lvDescs[lv]}</div>
         </div>`;
       }).join('')}
     </div>
-    <div class="reset-note">闖關紀錄將在 00:00 重置（距離重置 ${hh}h ${mm}m）</div>
+    <div class="extra-section-title">額外難度</div>
+    <div class="lv-cards">
+      <div class="lv-card extra" onclick="startGame('${game}','extraA')">
+        <div class="lv-card-title">🌶 額外 A｜延伸基礎</div>
+        <div class="lv-card-desc">sus2、add9、madd9、9、△9、m9</div>
+      </div>
+      <div class="lv-card extra" onclick="startGame('${game}','extraB')">
+        <div class="lv-card-title">🔥 額外 B｜高階爵士</div>
+        <div class="lv-card-desc">+7、+△7、13、m13</div>
+      </div>
+    </div>
+    <div class="reset-note">闖關紀錄將在 00:00 重置（距離 ${hh}h ${mm}m）</div>
   </div>`;
 }
 
-function goLevel(lv){
-  S={...S,level:lv,qIdx:0,correct:0,history:[],submitted:false,ans:{root:'',acc:'',quality:''},screen:'game'};
-  S.q=newQ();render();tick();
-}
-function tick(){setTimeout(()=>{const el=document.getElementById('stf');if(el)drawStaff(S.q.notes,el);},10);}
+function goHome(){sfxClick();S.screen='home';render();}
+function goLevelSelect(game){sfxClick();S.screen='level'+game;render();}
 
-function renderGame(app){
-  const ok=S.submitted&&checkOk(),bad=S.submitted&&!ok;
-  const cls=S.submitted?(ok?'correct':'wrong'):'';
-  const lvc=LV_CHORDS[S.level];
-  app.innerHTML=`
+function startGame(game,lv){
+  sfxClick();
+  const lvKey=lv==='mix'?'mix':lv==='extraA'?'extraA':lv==='extraB'?'extraB':String(lv);
+  S={...S,game,level:lv,levelKey:lvKey,
+    pool:buildPool(lvKey,false,false),
+    qIdx:0,correct:0,submitted:false,history:[],
+    ansRoot:'',ansAcc:'',ansQuality:'',ansExt:'',ansMaj:false,
+    bNotes:[],
+    screen:'game'+game,
+  };
+  const app=document.getElementById('app');
+  if(game==='A')renderGameA(app);
+  else renderGameB(app);
+}
+
+// ══════════════════════════════════════════════════════════════
+// GAME A — FULL RENDER
+// ══════════════════════════════════════════════════════════════
+function aLvLabel(){return S.levelKey==='mix'?'混合關':S.levelKey==='extraA'?'額外A':S.levelKey==='extraB'?'額外B':'Level '+S.level;}
+
+function renderGameA(app){
+  const q=S.pool[S.qIdx];
+  app.innerHTML=`<div id="game-root" style="display:flex;flex-direction:column;gap:8px">
   <div class="hdr">
-    <span class="lv-badge">${S.level===4?'混合關':'Level '+S.level}</span>
-    <span class="hdr-mid">第 ${S.qIdx+1} / 10 題</span>
-    <span class="hdr-score">✓ ${S.correct}</span>
+    <span class="lv-badge">${aLvLabel()}</span>
+    <span class="hdr-mid" id="hdr-p">第 ${S.qIdx+1} / 10 題</span>
+    <span class="hdr-score" id="hdr-s">✓ ${S.correct}</span>
   </div>
-  <div class="staff-card">
-    <div class="q-label">辨識下列和弦</div>
-    <div id="stf"></div>
+  <div style="display:flex;justify-content:flex-start">
+    <span class="hdr-back" onclick="backToLevelA()">← 返回選關</span>
   </div>
-  <div class="answer-box ${cls}">
+  <div class="staff-card"><div class="q-label">辨識下列和弦</div><div id="stf"></div></div>
+  <div class="answer-box" id="ans-box">
     <div>
-      <div class="answer-text">${ansDisplay()||'─'}</div>
-      ${bad?`<div class="correct-ans">正確：${S.q.display}</div>`:''}
+      <div class="answer-text" id="ans-text">─</div>
+      <div id="ans-hint" style="font-size:11px;color:#bbb">作答區</div>
     </div>
-    <div class="feedback-icon">${S.submitted?(ok?'✅':'❌'):'<span style="font-size:11px;color:#bbb">作答區</span>'}</div>
+    <div id="ans-icon" style="font-size:22px"></div>
   </div>
-  <div class="kbd">
-    <div class="kbd-section">
-      <div class="kbd-label">根音</div>
-      <div class="kbd-row">${NOTES.map(n=>`<div class="key${S.ans.root===n?' active':''}" onclick="sr('${n}')">${n}</div>`).join('')}</div>
+  ${renderAKbd()}
+  <div class="actions">
+    <button class="btn primary" id="btn-sub" onclick="aSubmit()" disabled>送出</button>
+    <button class="btn next-btn" id="btn-nxt" onclick="aNext()" disabled>下一題 →</button>
+  </div>
+  </div>`;
+  setTimeout(()=>{const el=document.getElementById('stf');if(el&&q)drawStaff(q.notes,el);},10);
+}
+
+function renderAKbd(){
+  const qualityKeys=['m','+','o','ø','sus4'];
+  const extKeys=['△','6','7','9','add9','13'];
+  return `<div class="kbd">
+    <div class="kbd-section"><div class="kbd-label">根音</div>
+      <div class="kbd-row">${NOTES.map(n=>`<div class="key" id="kr-${n}" onclick="aRoot('${n}')">${n}</div>`).join('')}</div>
     </div>
-    <div class="kbd-section">
-      <div class="kbd-label">升降記號</div>
+    <div class="kbd-section"><div class="kbd-label">升降記號</div>
       <div class="kbd-row">
-        <div class="key${S.ans.acc==='#'?' active':''}" onclick="sa('#')" style="flex:1">♯ 升</div>
-        <div class="key${S.ans.acc==='b'?' active':''}" onclick="sa('b')" style="flex:1">♭ 降</div>
+        <div class="key" id="ka-s" onclick="aAcc('#')" style="flex:1">♯ 升</div>
+        <div class="key" id="ka-f" onclick="aAcc('b')" style="flex:1">♭ 降</div>
       </div>
     </div>
-    ${qualityGroups.map(g=>`
-    <div class="kbd-section">
-      <div class="kbd-label">${g.label}</div>
-      <div class="kbd-row">${g.keys.map(k=>{
-        const avail=lvc.includes(k);
-        return `<div class="key${S.ans.quality===k?' active':''}${!avail?' dim':''}" onclick="${avail?`sq('${k}')`:''}">${Q_SYMBOL[k]}</div>`;
-      }).join('')}</div>
-    </div>`).join('')}
+    <div class="kbd-section"><div class="kbd-label">和弦質地（互斥）</div>
+      <div class="kbd-row">
+        ${qualityKeys.map(k=>`<div class="key" id="kq-${k}" onclick="aQuality('${k}')">${k==='o'?'°':k==='ø'?'ø':k}</div>`).join('')}
+      </div>
+    </div>
+    <div class="kbd-section"><div class="kbd-label">延伸音</div>
+      <div class="kbd-row">
+        ${extKeys.map(k=>`<div class="key" id="ke-${k}" onclick="aExt('${k}')">${k}</div>`).join('')}
+      </div>
+    </div>
     <div class="kbd-row" style="margin-top:2px">
-      <div class="key" style="max-width:120px" onclick="clr()">⌫ 清除</div>
+      <div class="key" style="max-width:120px" onclick="aClr()">⌫ 清除</div>
+    </div>
+  </div>`;
+}
+
+function updateGameA(){
+  const q=S.pool[S.qIdx];
+  const ok=S.submitted&&aCheckOk(),bad=S.submitted&&!ok;
+  const box=document.getElementById('ans-box');
+  if(box)box.className='answer-box'+(S.submitted?(ok?' correct':' wrong'):'');
+  const at=document.getElementById('ans-text');if(at)at.textContent=aAnsDisplay()||'─';
+  const hint=document.getElementById('ans-hint');
+  if(hint){hint.style.color=bad?'#A32D2D':'#bbb';hint.textContent=bad?`正確：${q.display}`:'作答區';}
+  const icon=document.getElementById('ans-icon');if(icon)icon.textContent=S.submitted?(ok?'✅':'❌'):'';
+  const p=document.getElementById('hdr-p');if(p)p.textContent=`第 ${S.qIdx+1} / 10 題`;
+  const sc=document.getElementById('hdr-s');if(sc)sc.textContent=`✓ ${S.correct}`;
+  // Keys
+  NOTES.forEach(n=>{const e=document.getElementById(`kr-${n}`);if(e)e.className='key'+(S.ansRoot===n?' active':'');});
+  const ks=document.getElementById('ka-s');if(ks)ks.className='key'+(S.ansAcc==='#'?' active':'');
+  const kf=document.getElementById('ka-f');if(kf)kf.className='key'+(S.ansAcc==='b'?' active':'');
+  ['m','+','o','ø','sus4'].forEach(k=>{const e=document.getElementById(`kq-${k}`);if(e)e.className='key'+(S.ansQuality===k?' active':'');});
+  ['△','6','7','9','add9','13'].forEach(k=>{const e=document.getElementById(`ke-${k}`);if(e)e.className='key'+(S.ansExt===k&&!S.ansMaj||k==='△'&&S.ansMaj?' active':'');});
+  const bs=document.getElementById('btn-sub');if(bs)bs.disabled=!aCanSubmit();
+  const bn=document.getElementById('btn-nxt');if(bn)bn.disabled=!S.submitted;
+}
+
+function aRoot(r){if(S.submitted)return;sfxClick();S.ansRoot=r;updateGameA();}
+function aAcc(a){if(S.submitted)return;sfxClick();S.ansAcc=S.ansAcc===a?'':a;updateGameA();}
+function aQuality(q){if(S.submitted)return;sfxClick();S.ansQuality=S.ansQuality===q?'':q;updateGameA();}
+function aExt(e){
+  if(S.submitted)return;sfxClick();
+  if(e==='△'){S.ansMaj=!S.ansMaj;}
+  else{S.ansExt=S.ansExt===e?'':e;}
+  updateGameA();
+}
+function aClr(){if(S.submitted)return;sfxClick();S.ansRoot='';S.ansAcc='';S.ansQuality='';S.ansExt='';S.ansMaj=false;updateGameA();}
+function backToLevelA(){sfxClick();S.screen='levelA';render();}
+
+function aSubmit(){
+  if(!aCanSubmit())return;
+  S.submitted=true;
+  const ok=aCheckOk();
+  if(ok){S.correct++;sfxCorrect();}else sfxWrong();
+  const q=S.pool[S.qIdx];
+  setTimeout(()=>playChord(q.midis),ok?300:200);
+  S.history.push({q,user:aAnsDisplay()||S.ansRoot,ok});
+  updateGameA();
+}
+function aNext(){
+  if(S.qIdx>=9){S.screen='summaryA';render();return;}
+  sfxClick();S.qIdx++;S.submitted=false;
+  S.ansRoot='';S.ansAcc='';S.ansQuality='';S.ansExt='';S.ansMaj=false;
+  updateGameA();
+  setTimeout(()=>{const el=document.getElementById('stf');if(el)drawStaff(S.pool[S.qIdx].notes,el);},10);
+}
+
+// ══════════════════════════════════════════════════════════════
+// GAME B — FULL RENDER
+// ══════════════════════════════════════════════════════════════
+const ALL_NOTES_B=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+function renderGameB(app){
+  const q=S.pool[S.qIdx];
+  app.innerHTML=`<div id="game-root" style="display:flex;flex-direction:column;gap:8px">
+  <div class="hdr">
+    <span class="lv-badge b">${aLvLabel()}</span>
+    <span class="hdr-mid" id="hdr-p">第 ${S.qIdx+1} / 10 題</span>
+    <span class="hdr-score" id="hdr-s">✓ ${S.correct}</span>
+  </div>
+  <div style="display:flex;justify-content:flex-start">
+    <span class="hdr-back" onclick="backToLevelB()">← 返回選關</span>
+  </div>
+  <div class="staff-card">
+    <div class="q-label" style="font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:4px" id="b-chord-name">${q?q.display:''}</div>
+    <div class="q-label">請按出和弦的組成音符</div>
+    <div id="stf"></div>
+  </div>
+  <div class="answer-box" id="ans-box">
+    <div>
+      <div class="answer-text" id="ans-text" style="font-size:18px">─</div>
+      <div id="ans-hint" style="font-size:11px;color:#bbb">作答區</div>
+    </div>
+    <div id="ans-icon" style="font-size:22px"></div>
+  </div>
+  <div class="kbd">
+    <div class="kbd-section"><div class="kbd-label">音符（點兩下刪除）</div>
+      <div class="kbd-row">${ALL_NOTES_B.slice(0,7).map(n=>`<div class="key" id="bn-${n}" onclick="bNote('${n}')">${n}</div>`).join('')}</div>
+      <div class="kbd-row" style="margin-top:5px">${ALL_NOTES_B.slice(7).map(n=>`<div class="key" id="bn-${n}" onclick="bNote('${n}')">${n}</div>`).join('')}
+        <div class="key" style="flex:1;background:#f0f0ec" onclick="bClrLast()">⌫</div>
+        <div class="key" style="flex:1;background:#f0f0ec" onclick="bClrAll()">清除</div>
+      </div>
     </div>
   </div>
   <div class="actions">
-    <button class="btn primary" onclick="doSubmit()" ${canSubmit()?'':'disabled'}>送出</button>
-    <button class="btn next-btn" onclick="nextQ()" ${S.submitted?'':'disabled'}>下一題 →</button>
+    <button class="btn primary b" id="btn-sub" onclick="bSubmit()" disabled>送出</button>
+    <button class="btn next-btn" id="btn-nxt" onclick="bNext()" disabled>下一題 →</button>
+  </div>
   </div>`;
-  tick();
+  setTimeout(()=>{const el=document.getElementById('stf');if(el)drawStaff([],el);},10);
 }
 
-function sr(r){if(S.submitted)return;S.ans.root=r;render();}
-function sa(a){if(S.submitted)return;S.ans.acc=(S.ans.acc===a?'':a);render();}
-function sq(q){if(S.submitted)return;S.ans.quality=(S.ans.quality===q?'':q);render();}
-function clr(){if(S.submitted)return;S.ans={root:'',acc:'',quality:''};render();}
+function bMidiOf(noteName){return ROOT_MIDI[noteName];}// C4-B4
 
-function doSubmit(){
-  if(!canSubmit())return;
+function bNote(name){
+  if(S.submitted)return;
+  sfxClick();
+  const midi=bMidiOf(name);
+  const idx=S.bNotes.indexOf(midi);
+  if(idx>=0){
+    // double tap = remove
+    S.bNotes.splice(idx,1);
+  } else {
+    S.bNotes.push(midi);
+    pianoNote(midi,0.15);
+  }
+  updateGameB();
+}
+function bClrLast(){if(S.submitted)return;sfxClick();S.bNotes.pop();updateGameB();}
+function bClrAll(){if(S.submitted)return;sfxClick();S.bNotes=[];updateGameB();}
+function backToLevelB(){sfxClick();S.screen='levelB';render();}
+
+function updateGameB(){
+  const q=S.pool[S.qIdx];
+  const ok=S.submitted&&bCheckOk(),bad=S.submitted&&!ok;
+  const box=document.getElementById('ans-box');
+  if(box)box.className='answer-box'+(S.submitted?(ok?' correct':' wrong'):'');
+  // Build display string for entered notes
+  const noteNames=S.bNotes.map(m=>ALL_NOTES_B[((m-60)%12+12)%12]);
+  const at=document.getElementById('ans-text');if(at)at.textContent=noteNames.join('  ')||'─';
+  const hint=document.getElementById('ans-hint');
+  if(hint){hint.style.color=bad?'#A32D2D':'#bbb';hint.textContent=bad?`正確：${q.display}`:'作答區';}
+  const icon=document.getElementById('ans-icon');if(icon)icon.textContent=S.submitted?(ok?'✅':'❌'):'';
+  const p=document.getElementById('hdr-p');if(p)p.textContent=`第 ${S.qIdx+1} / 10 題`;
+  const sc=document.getElementById('hdr-s');if(sc)sc.textContent=`✓ ${S.correct}`;
+  // Note buttons highlight
+  ALL_NOTES_B.forEach(n=>{
+    const midi=bMidiOf(n);
+    const el=document.getElementById(`bn-${n}`);
+    if(el)el.className='key'+(S.bNotes.includes(midi)?' active b':'');
+  });
+  // Draw staff with entered notes
+  const staffNotes=S.bNotes.map(midi=>{
+    const pc=((midi-60)%12+12)%12;
+    // Use sharp spelling
+    const sharpMap=[
+      {slot:-2,acc:''},{slot:-2,acc:'#'},{slot:-1,acc:''},{slot:-1,acc:'#'},
+      {slot:0,acc:''},{slot:1,acc:''},{slot:1,acc:'#'},{slot:2,acc:''},
+      {slot:2,acc:'#'},{slot:3,acc:''},{slot:3,acc:'#'},{slot:4,acc:''},
+    ];
+    return {midi,...sharpMap[pc]};
+  });
+  const el=document.getElementById('stf');
+  if(el)drawStaff(staffNotes,el,S.bNotes);
+  const bs=document.getElementById('btn-sub');if(bs)bs.disabled=!bCanSubmit();
+  const bn=document.getElementById('btn-nxt');if(bn)bn.disabled=!S.submitted;
+}
+
+function bSubmit(){
+  if(!bCanSubmit())return;
   S.submitted=true;
-  const ok=checkOk();
-  if(ok)S.correct++;
-  S.history.push({q:S.q,user:ansDisplay()||S.ans.root,ok});
-  render();
+  const ok=bCheckOk();
+  if(ok){S.correct++;sfxCorrect();}else sfxWrong();
+  const q=S.pool[S.qIdx];
+  setTimeout(()=>playChord(q.midis),ok?300:200);
+  const noteNames=S.bNotes.map(m=>ALL_NOTES_B[((m-60)%12+12)%12]);
+  S.history.push({q,user:noteNames.join(' '),ok});
+  updateGameB();
 }
-function nextQ(){
-  if(S.qIdx>=9){S.screen='summary';render();return;}
-  S.qIdx++;S.submitted=false;S.ans={root:'',acc:'',quality:''};S.q=newQ();render();
+function bNext(){
+  if(S.qIdx>=9){S.screen='summaryB';render();return;}
+  sfxClick();S.qIdx++;S.submitted=false;S.bNotes=[];
+  updateGameB();
+  const cn=document.getElementById('b-chord-name');
+  if(cn)cn.textContent=S.pool[S.qIdx].display;
+  setTimeout(()=>{const el=document.getElementById('stf');if(el)drawStaff([],el);},10);
 }
+
+// ══════════════════════════════════════════════════════════════
+// SUMMARY
+// ══════════════════════════════════════════════════════════════
 function renderSummary(app){
+  const isA=S.screen==='summaryA';
   const pct=Math.round(S.correct/10*100),passed=pct>=90;
-  if(passed&&S.level<4&&S.level>=S.unlockedLevel){S.unlockedLevel=S.level+1;saveProgress();}
-  const nextMsg=S.level===3&&passed?'🎉 解鎖混合關！':S.level===4&&passed?'🏆 混合關制霸！':passed?`🎉 通過！解鎖 Level ${S.level+1}`:'';
+  // Unlock logic
+  if(passed){
+    const lvNum=typeof S.level==='number'?S.level:0;
+    if(isA&&lvNum>=1&&lvNum<3&&lvNum>=S.unlockedA){S.unlockedA=lvNum+1;persist();}
+    if(!isA&&lvNum>=1&&lvNum<3&&lvNum>=S.unlockedB){S.unlockedB=lvNum+1;persist();}
+    setTimeout(sfxLevelUp,200);
+  }
+  const lvLabel=S.levelKey==='mix'?'混合關':S.levelKey==='extraA'?'額外A':S.levelKey==='extraB'?'額外B':'Level '+S.level;
+  const nextMsg=passed&&typeof S.level==='number'&&S.level<3?`🎉 通過！解鎖 Level ${S.level+1}`:passed?'🎉 通過！':'';
   app.innerHTML=`<div class="summary">
-    <div style="font-size:16px;font-weight:600;color:#1a1a1a">${S.level===4?'混合關':'Level '+S.level} 結果</div>
+    <div style="font-size:16px;font-weight:700;color:#1a1a1a">${isA?'🎼':'🎹'} ${lvLabel} 結果</div>
     <div class="sum-stats">
       <div class="stat-box"><div class="stat-num">${S.correct}</div><div class="stat-lbl">答對</div></div>
       <div class="stat-box"><div class="stat-num">${10-S.correct}</div><div class="stat-lbl">答錯</div></div>
       <div class="stat-box"><div class="stat-num">${pct}%</div><div class="stat-lbl">正確率</div></div>
     </div>
     <div class="pass-msg ${passed?'pass':'fail'}">${passed?nextMsg||'✅ 通過！':'😅 再加油！需達 90% 才晉級'}</div>
-    <div class="sum-list">${S.history.map((h,i)=>`
+    <div class="sum-list">${(S.history||[]).map((h,i)=>`
       <div class="sum-item ${h.ok?'ok':'bad'}">
         <div style="font-size:14px;flex-shrink:0">${h.ok?'✅':'❌'}</div>
         <div>
@@ -371,32 +753,23 @@ function renderSummary(app){
         </div>
       </div>`).join('')}
     </div>
-    <button class="btn-full" onclick="S.screen='start';render()">返回選關</button>
-    <button class="btn-sec" onclick="goLevel(${S.level})">再練一次</button>
+    <button class="btn-full${isA?'':' b'}" onclick="goLevelSelect('${isA?'A':'B'}')">返回選關</button>
+    <button class="btn-sec" onclick="startGame('${isA?'A':'B'}','${S.levelKey}')">再練一次</button>
+    <button class="btn-sec" onclick="goHome()">回首頁</button>
   </div>`;
 }
 
+// ══════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════
 render();
 
-// ── Service Worker (PWA offline support) ─────────────────────────────
 if('serviceWorker' in navigator){
-  const swCode=`
-    const CACHE='chord-quiz-v1';
-    self.addEventListener('install',e=>{
-      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/'])));
-      self.skipWaiting();
-    });
-    self.addEventListener('activate',e=>{
-      e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
-      self.clients.claim();
-    });
-    self.addEventListener('fetch',e=>{
-      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/'))));
-    });
-  `;
-  const blob=new Blob([swCode],{type:'application/javascript'});
-  const swUrl=URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(()=>{});
+  const sw=`const C='chord-v4';
+self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])));self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/'))));});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
 }
 </script>
 </body>
