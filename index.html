@@ -276,7 +276,7 @@ function dblSharp(cx,cy,ink){
 }
 
 function drawStaff(notes,container,hilite=[]){
-  const W=300,HS=10,BY=108,SL=[0,2,4,6,8];
+  const W=300,HS=10,BY=118,SL=[0,2,4,6,8];
   const sy=s=>BY-s*HS;
   const ink='#1a1a1a',bg='#fff',RX=10,RY=7.5,NX=195,AX=NX-RX-14;
   const sorted=[...notes].sort((a,b)=>a.slot-b.slot);
@@ -286,7 +286,7 @@ function drawStaff(notes,container,hilite=[]){
     if(n.slot<=-2)for(let s=-2;s>=n.slot;s-=2)ledge.add(s);
     if(n.slot>=10)for(let s=10;s<=n.slot;s+=2)ledge.add(s);
   });
-  let svg=`<svg viewBox="0 0 ${W} 148" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block;">`;
+  let svg=`<svg viewBox="0 0 ${W} 158" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block;">`;
   svg+=`<rect width="${W}" height="148" fill="transparent"/>`;
   SL.forEach(s=>{const y=sy(s);svg+=`<line x1="32" y1="${y}" x2="${W-8}" y2="${y}" stroke="${ink}" stroke-width="1" opacity="0.55"/>`;});
   // Treble clef — anchored so:
@@ -310,12 +310,37 @@ function drawStaff(notes,container,hilite=[]){
   });
   svg+='</svg>';
   container.innerHTML=svg;
+  // Debug: show slot values
+  const debug=document.getElementById('stf-debug');
+  if(debug)debug.textContent='slots: '+pos.map(n=>n.slot).join(', ');
 }
 
 // ══════════════════════════════════════════
 // GAME B — auto octave staff notes
 // ══════════════════════════════════════════
 // Given root midi and a note name string (e.g. 'E#','Bb'), compute midi and staff info
+
+function noteNameToStaff(noteName,rootKey){
+  // Track octave by note NAME (diatonic steps from root), not by midi value
+  // This correctly handles B#(oct4), Cb(oct5), E#(oct4), Fb(oct4) etc.
+  const base=noteName[0],acc=noteName.slice(1);
+  const noteDia=NAME_TO_DIA[base];
+  const noteShift=acc==='#'?1:acc==='b'?-1:acc==='##'?2:acc==='bb'?-2:0;
+  const rootName=rootKey[0];
+  const rootDia=NAME_TO_DIA[rootName];
+  const rootMidi=ROOT_MIDI_MAP[rootKey];
+  const rootOct=Math.floor(rootMidi/12)-1;
+  // Count diatonic steps upward from root to note
+  let diaDelta=noteDia-rootDia;
+  if(diaDelta<0)diaDelta+=7;
+  const targetOct=rootOct+Math.floor((rootDia+diaDelta)/7);
+  const naturalMidiInOct=(targetOct+1)*12+DIA_SEMI[noteDia];
+  const midi=naturalMidiInOct+noteShift;
+  const slot=(targetOct-4)*7+(noteDia-2);
+  const accStr=acc==='#'?'#':acc==='b'?'b':acc==='##'?'x':acc==='bb'?'bb':'';
+  return {midi,slot,acc:accStr};
+}
+
 function noteNameToMidi(noteName){
   const base=noteName[0];
   const acc=noteName.slice(1);
@@ -324,22 +349,7 @@ function noteNameToMidi(noteName){
   return baseMidi+shift;
 }
 
-function noteNameToStaff(noteName,rootMidi){
-  const base=noteName[0];
-  const acc=noteName.slice(1);
-  const baseDia=NAME_TO_DIA[base];
-  // Find appropriate octave: note midi >= rootMidi, within 12 semitones above
-  const baseMidiC4={C:60,D:62,E:64,F:65,G:67,A:69,B:71}[base];
-  const shift=acc==='#'?1:acc==='b'?-1:acc==='##'?2:acc==='bb'?-2:0;
-  let midi=baseMidiC4+shift;
-  // Bring to same or higher octave as rootMidi
-  while(midi<rootMidi)midi+=12;
-  if(midi-rootMidi>12)midi-=12;
-  const oct=Math.floor(midi/12)-1;
-  const slot=(oct-4)*7+(baseDia-2);
-  const accStr=acc==='#'?'#':acc==='b'?'b':acc==='##'?'x':acc==='bb'?'bb':'';
-  return {midi,slot,acc:accStr};
-}
+
 
 // ══════════════════════════════════════════
 // POOL BUILDER
@@ -792,6 +802,7 @@ function rGameB(app){
     <div id="BCN" style="font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:2px">${q?q.display:''}</div>
     <div class="q-label">按出所有組成音符</div>
     <div id="STF"></div>
+    <div id="stf-debug" style="font-size:10px;color:#999;margin-top:2px"></div>
   </div>
   <div class="answer-box" id="AB">
     <div style="flex:1">
@@ -890,8 +901,7 @@ function uGameB(){
   const bn=document.getElementById('BN');if(bn)bn.disabled=!S.submitted;
 
   // Draw staff
-  const rootMidi=ROOT_MIDI_MAP[q.root];
-  const staffNotes=S.bNotes.map(nn=>noteNameToStaff(nn,rootMidi));
+  const staffNotes=S.bNotes.map(nn=>noteNameToStaff(nn,q.root));
   const el=document.getElementById('STF');
   if(el)drawStaff(staffNotes,el,staffNotes.map(n=>n.midi));
 }
@@ -906,7 +916,7 @@ function bNote(n){
     if(!S.bNotes.includes(noteName)){
       S.bNotes.push(noteName);
       const q=S.pool[S.qIdx];
-      const{midi}=noteNameToStaff(noteName,ROOT_MIDI_MAP[q.root]);
+      const{midi}=noteNameToStaff(noteName,q.root);
       piano(midi,0.15);
     }
     S.bPending='';S.bPendingAcc='';
@@ -984,7 +994,7 @@ function rSum(app){
 // ══════════════════════════════════════════
 render();
 if('serviceWorker' in navigator){
-  const sw=`const C='cv12';
+  const sw=`const C='cv17';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
 self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/'))));});`;
